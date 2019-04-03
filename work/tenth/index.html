@@ -67,11 +67,19 @@
       // </li>
       var keyWord = '';
       var counter = 1;
-
+      var insert = '';
 
       prepareErrorMessage();
       $('.search__btn').click(function() {
+        serchFunc();
+      });
+
+
+      // ------------------------------------------------　以下、関数　------------------------------------------------
+      // --------------------------------------　メイン関数　--------------------------------------
+      function serchFunc() {
         keyWordGetAndChecker($('.search__text__input').val());
+        console.log(counter + ', ' + keyWord);
         $.ajax({
           url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
           type: 'GET',
@@ -87,21 +95,20 @@
           // データの状態見るならここ↓
           // console.log(data);
           noHitMessage(data.hits);
-          removeItems();
+          // removeItems();
           $.each(data.Items, function(index){
-            displayItems(data, index);
+            makeItems(data, index);
           });
+          displayItems();
         }).fail(function(errors){
           // エラー見るならここ↓
           // console.log(errors);
           // アイテム消してエラーメッセージ出すならここ↓
-          // removeItems();
+          removeItems(errors);
           errorMessage(errors.status);
         });
-      });
+      }
 
-
-      // ------------------------------------------------　以下、関数　------------------------------------------------
       // --------------------------------------　エラー系　--------------------------------------
       // エラーメッセージの準備
       function prepareErrorMessage() {
@@ -135,13 +142,21 @@
       }
 
       // --------------------------------------　アイテム表示系　--------------------------------------
-      // ディスプレイにアイテムを表示させる関数
-      function displayItems(data, index) {
-        $('.lists').append("<li class='lists__item'><div class='lists__item__inner'><a href='' class='lists__item__link' target='_blank'><img src='" + data.Items[index].Item.largeImageUrl + "' class='lists__item__img' alt=''><p class='lists__item__detail'>作品名：" + data.Items[index].Item.title + "</p><p class='lists__item__detail'>作者　：" + data.Items[index].Item.author + "</p><p class='lists__item__detail'>出版社：" + data.Items[index].Item.publisherName + "</p></a></div></li>");
+      // ディスプレイに表示させるアイテムを作る関数
+      function makeItems(data, index) {
+        insert += "<li class='lists__item'><div class='lists__item__inner'><a href='' class='lists__item__link' target='_blank'><img src='" + data.Items[index].Item.largeImageUrl + "' class='lists__item__img' alt=''><p class='lists__item__detail'>作品名：" + data.Items[index].Item.title + "</p><p class='lists__item__detail'>作者　：" + data.Items[index].Item.author + "</p><p class='lists__item__detail'>出版社：" + data.Items[index].Item.publisherName + "</p></a></div></li>"
+      }
+
+      function displayItems() {
+        removeItems();
+        $('.lists').prepend(insert);
+        insert = '';
       }
       // 表示中のアイテムを削除
-      function removeItems() {
-        $('.lists').children('li').remove();
+      function removeItems(error) {
+        if(counter === 1 || error) {
+          $('.lists').children('li').remove();
+        }
       }
 
       // --------------------------------------　検索系　--------------------------------------

@@ -65,9 +65,96 @@
       //    </a>
       //  </div>
       // </li>
-      //
-      //
-      //
+      var keyWord = '';
+      var counter = 1;
+
+
+      prepareErrorMessage();
+      $('.search__btn').click(function() {
+        keyWordGetAndChecker($('.search__text__input').val());
+        $.ajax({
+          url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+          type: 'GET',
+          datatype: 'json',
+          data: {
+            applicationId: '1019399324990976605',
+            booksGenreId: '001',
+            keyword: keyWord,
+            hits: 20,
+            page: counter
+          },
+        }).done(function(data){
+          // データの状態見るならここ↓
+          // console.log(data);
+          noHitMessage(data.hits);
+          removeItems();
+          $.each(data.Items, function(index){
+            displayItems(data, index);
+          });
+        }).fail(function(errors){
+          // エラー見るならここ↓
+          // console.log(errors);
+          // アイテム消してエラーメッセージ出すならここ↓
+          // removeItems();
+          errorMessage(errors.status);
+        });
+      });
+
+
+      // ------------------------------------------------　以下、関数　------------------------------------------------
+      // --------------------------------------　エラー系　--------------------------------------
+      // エラーメッセージの準備
+      function prepareErrorMessage() {
+        $('.lists').before("<div class='message errorMessage'>検索結果が見つかりませんでした。<br>別のキーワードで検索してください。</div>");
+        $('.lists').before("<div class='message errorMessageKeyWord'>キーワードが入力されていないか、1文字だけの入力になっています。<br>キーワードを入力してください。</div>");
+        $('.lists').before("<div class='message errorMessageRequest'>リクエスト過多になっています。<br>時間を空けて検索してください。</div>");
+        $('.lists').before("<div class='message errorMessageInternet'>ネットに繋がっていません。<br>ネットの接続を確認してください。</div>");
+        $('.message').hide();
+      }
+      // hit数に応じてエラーメッセージを表示
+      function noHitMessage(hits) {
+        $('.message').hide();
+        if(hits == 0) {
+          $('.errorMessage').show();
+        }
+      }
+      // エラーステータスに応じてエラーメッセージを表示
+      function errorMessage(error) {
+        $('.message').hide();
+        switch(error) {
+          case 400:
+            $('.errorMessageKeyWord').show();
+            break;
+          case 429:
+            $('.errorMessageRequest').show();
+            break;
+          case 0:
+            $('.errorMessageInternet').show();
+            break;
+        }
+      }
+
+      // --------------------------------------　アイテム表示系　--------------------------------------
+      // ディスプレイにアイテムを表示させる関数
+      function displayItems(data, index) {
+        $('.lists').append("<li class='lists__item'><div class='lists__item__inner'><a href='' class='lists__item__link' target='_blank'><img src='" + data.Items[index].Item.largeImageUrl + "' class='lists__item__img' alt=''><p class='lists__item__detail'>作品名：" + data.Items[index].Item.title + "</p><p class='lists__item__detail'>作者　：" + data.Items[index].Item.author + "</p><p class='lists__item__detail'>出版社：" + data.Items[index].Item.publisherName + "</p></a></div></li>");
+      }
+      // 表示中のアイテムを削除
+      function removeItems() {
+        $('.lists').children('li').remove();
+      }
+
+      // --------------------------------------　検索系　--------------------------------------
+      // キーワードの新規性とダブり回数をチェック
+      function keyWordGetAndChecker(value) {
+        if(keyWord === value) {
+          counter++;
+        } else {
+          keyWord = value;
+          counter = 1;
+        }
+      }
+
     </script>
   </body>
 </html>

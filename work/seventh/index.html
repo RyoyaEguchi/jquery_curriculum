@@ -26,14 +26,61 @@
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
-      // 今回やるのはスライドショーです。
-      // 右方向には右のボタンを押すと移動し、左方向には左のボタンを押すと移動する。また右端にいる状態で右のボタンを押すと最初の位置に戻り、 左端にいる状態で左のボタンを押すと最後の位置に移動する。data属性にprev,nextを記述してあるのでこちらを取得すると楽です。
-      // 位置情報は配列に格納しておき、右のボタンをクリックするたびに配列の添字を1追加し、左のボタンをクリックすると配列の添字を1減らします。そうすることによって次の座標が取得できます。その座標にアニメーションさせるととても楽です。
-      // [使用するメソッド]
-      // .animate({}) cssのプロパティを一定時間かけて変化させます。アニメーションです。
-      // .data() 要素のdata属性を取得します。
-      // .width() 要素の幅を取得します。
-      // .length 要素の個数を取得します。
+    // 今回やるのはスライドショーです。
+    // 右方向には右のボタンを押すと移動し、左方向には左のボタンを押すと移動する。また右端にいる状態で右のボタンを押すと最初の位置に戻り、 左端にいる状態で左のボタンを押すと最後の位置に移動する。data属性にprev,nextを記述してあるのでこちらを取得すると楽です。
+    // 位置情報は配列に格納しておき、右のボタンをクリックするたびに配列の添字を1追加し、左のボタンをクリックすると配列の添字を1減らします。そうすることによって次の座標が取得できます。その座標にアニメーションさせるととても楽です。
+    // [使用するメソッド]
+    // .animate({}) cssのプロパティを一定時間かけて変化させます。アニメーションです。
+    // .data() 要素のdata属性を取得します。
+    // .width() 要素の幅を取得します。
+    // .length 要素の個数を取得します。
+
+    //写真の枚数を取得
+    var num = $('.slider-list').children('li').length;
+    var counter = 0;
+    var pointer = [0, 600, 1200, 1800];
+    var flag = true;
+    // pointer[0] = 0;
+    //
+    // //移動するポイントを取得
+    // var pointer = [0];
+    // $('.slider-list').children('li').children('img').each(function(index) {
+    //   var width = $(this).width();
+    //   console.log(width);
+    //   pointer[index] = pointer[index - 1] + $(this).width();
+    // });
+    // console.log(pointer);
+
+    $('.is-prev').click(function() {
+      if(flag) {
+        flag = false;
+        if(counter == 0) {
+          counter = num - 1;
+        } else {
+          counter--;
+        }
+        $('.slider-list').animate({
+          'left': -pointer[counter]
+        }, 1000, function(){
+          flag = true;
+        });
+      }
+    });
+    $('.is-next').click(function() {
+      if(flag) {
+        flag = false;
+        if(counter == num - 1) {
+          counter = 0;
+        } else {
+          counter++;
+        }
+        $('.slider-list').animate({
+          'left': -pointer[counter]
+        }, 1000, function(){
+          flag = true;
+        });
+      }
+    });
     </script>
   </body>
 </html>
